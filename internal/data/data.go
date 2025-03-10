@@ -68,7 +68,7 @@ func (m *DataModel) NewData(message mqtt.Message) (*Data, error) {
 				Name: fmt.Sprintf("%s #%d", locationType, locationID),
 				Type: locationType,
 			},
-			Name: fmt.Sprintf("%s #%s", device, deviceID),
+			Type: fmt.Sprintf("%s #%s", device, deviceID),
 		},
 		ModuleName:  moduleName,
 		ModuleValue: moduleValue,
@@ -80,7 +80,7 @@ func (m *DataModel) NewData(message mqtt.Message) (*Data, error) {
 		// FIXME -> reset device or skip data?
 		return nil, fmt.Errorf("error finding device %w", err)
 	}
-	// Get ModuleID from Device.Modules by matching Device.ID/Module.Name
+	// Get ModuleID from Device.Modules by matching Device.ID/Module.Type
 	for _, module := range data.Device.Modules {
 		if module.Name == data.ModuleName {
 			data.ModuleID = module.ID

@@ -4,7 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"time"
-	
+
 	"gorm.io/gorm"
 )
 
@@ -15,12 +15,12 @@ type Device struct {
 	DeletedAt  gorm.DeletedAt `gorm:"index"`
 	LocationID uint
 	Location   Location `gorm:"foreignKey:LocationID"`
-	Name       string
+	Type       string
 	Modules    []Module
 }
 
 func (d *Device) GetChannel(iModule IModule) string {
-	return fmt.Sprintf("home/%s/%d/%s/%s/%s", d.Location.Type, d.LocationID, d.Name, d.ID, iModule.GetName())
+	return fmt.Sprintf("home/%s/%d/%s/%s/%s", d.Location.Type, d.LocationID, d.Type, d.ID, iModule.GetName())
 }
 
 type DeviceModel struct {
@@ -38,7 +38,7 @@ func (m *DeviceModel) GetByID(id string) (*Device, error) {
 			return nil, fmt.Errorf("failed to get device with id %s: %w", id, err)
 		}
 	}
-	
+
 	return &device, nil
 }
 
@@ -56,7 +56,7 @@ func (m *DeviceModel) GetByLocationID(locationID uint) ([]*Device, error) {
 	if len(devices) == 0 {
 		return nil, fmt.Errorf("device in location with id %d not found", locationID)
 	}
-	
+
 	return devices, nil
 }
 
@@ -74,12 +74,12 @@ func (m *DeviceModel) GetAll() ([]*Device, error) {
 	if len(devices) == 0 {
 		return nil, fmt.Errorf("0 devices found")
 	}
-	
+
 	return devices, nil
 }
 
 func (m *DeviceModel) UpdateLocation(device *Device) error {
-	
+
 	result := m.DB.FirstOrCreate(&device.Location, &Location{Name: device.Location.Name, Type: device.Location.Type})
 	if result.Error != nil {
 		return fmt.Errorf("error updating location: %w", result.Error)
@@ -88,28 +88,28 @@ func (m *DeviceModel) UpdateLocation(device *Device) error {
 	if err != nil {
 		return fmt.Errorf("error updating device locationID: %w", err)
 	}
-	
+
 	return nil
 }
 
 func (m *DeviceModel) CheckOrCreate(device *Device) error {
-	
+
 	// Fetch device from Database by ID
 	err := m.DB.Joins("Module").First(&device, "id = ?", device.ID).Error
-	
+
 	// Handle errors
 	if err != nil {
 		switch {
-		
+
 		// Device does not exist
 		case errors.Is(err, gorm.ErrRecordNotFound):
-			
+
 			// Check or create the location
 			err = m.CheckOrCreateLocation(&device.Location)
 			if err != nil {
 				return err
 			}
-			
+
 			// Create the device with its modules
 			result := m.DB.Create(device)
 			if result.Error != nil {
@@ -122,7 +122,7 @@ func (m *DeviceModel) CheckOrCreate(device *Device) error {
 			return fmt.Errorf("error fetching device: %w", err)
 		}
 	}
-	
+
 	return nil
 }
 

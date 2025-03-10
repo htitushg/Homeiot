@@ -7,7 +7,7 @@ import (
 
 type StartupMessage struct {
 	DeviceID     string `json:"id"`
-	Name         string `json:"name"`
+	Type         string `json:"type"`
 	LocationID   uint   `json:"location_id"`
 	LocationType string `json:"location_type"`
 	LocationName string `json:"location_name"`
@@ -26,16 +26,16 @@ func NewStartupMessage(payload []byte) (*StartupMessage, error) {
 }
 
 func NewResponseMessage(device *Device) *StartupMessage {
-	
+
 	// Create the responseMessage
 	responseMessage := &StartupMessage{
 		DeviceID:     device.ID,
-		Name:         device.Name,
+		Type:         device.Type,
 		LocationID:   device.LocationID,
 		LocationType: device.Location.Type,
 		LocationName: device.Location.Name,
 	}
-	
+
 	// Add the modules
 	for _, module := range device.Modules {
 		responseMessage.Modules = append(responseMessage.Modules, struct {
@@ -43,7 +43,7 @@ func NewResponseMessage(device *Device) *StartupMessage {
 			Value string `json:"value"`
 		}{Name: module.Name, Value: module.Value})
 	}
-	
+
 	return responseMessage
 }
 
@@ -56,7 +56,7 @@ func (startupMessage *StartupMessage) ToDevice() *Device {
 		ID:         startupMessage.DeviceID,
 		LocationID: 0,
 		Location:   *location,
-		Name:       startupMessage.Name,
+		Type:       startupMessage.Type,
 		Modules:    nil,
 	}
 	for _, module := range startupMessage.Modules {
