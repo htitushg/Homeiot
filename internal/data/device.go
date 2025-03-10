@@ -16,6 +16,7 @@ type Device struct {
 	LocationID uint
 	Location   Location `gorm:"foreignKey:LocationID"`
 	Type       string
+	Name       string
 	Modules    []Module
 }
 
