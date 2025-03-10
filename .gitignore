@@ -15,5 +15,6 @@ vendor
 *.pem
 
 # env files (can opt-in for committing if needed)
+env.ps1
 .env
 .envrc
