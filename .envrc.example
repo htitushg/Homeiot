@@ -1,0 +1,19 @@
+# Database
+export DATABASE_DSN='host=localhost user=home_iot password=password dbname=home_iot port=5432 sslmode=disable TimeZone=Europe/Paris'
+
+# Mails
+export SMTP_HOST='io.smtp.mail'
+export SMTP_PORT=2525
+export SMTP_SENDER='Home IoT <no-reply@home-iot.com>'
+export SMTP_USERNAME='no-reply@home-iot'
+export SMTP_PASSWORD='password'
+
+# Go Server
+export PORT=8080
+export ENVIRONMENT="development"
+
+# MQTT Broker
+export BROKER_HOST="localhost"
+export BROKER_PORT=1883
+export BROKER_QOS=0
+export BROKER_SUBSCRIPTION_CHANNEL="home/+/+/+/+/+"

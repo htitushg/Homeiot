@@ -1,0 +1,30 @@
+{{define "subject"}}Alert!{{end}}
+
+{{define "plainBody"}}
+An unknown presence has been detected.
+{{/* Add the details here */}}
+
+© Home IoT
+Contact us at {{ .Email }}
+{{end}}
+
+{{define "htmlBody"}}
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <meta http-equiv="Content-Type" content="text/html, charset=UTF-8" />
+</head>
+
+<body>
+    <p>An unknown presence has been detected.</p>
+    <div>
+        <p>{{/* Add the command details here */}}</p>
+    </div>
+    <p>© Home IoT</p>
+    <p>Contact us at {{ .Email }}</p>
+</body>
+
+</html>
+{{end}}
