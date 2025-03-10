@@ -6,7 +6,7 @@ import (
 	"log/slog"
 	"strconv"
 	"strings"
-	
+
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"gorm.io/gorm"
 )
@@ -27,43 +27,34 @@ type DataModel struct {
 }
 
 func (m *DataModel) NewData(message mqtt.Message) (*Data, error) {
-	
-	// TODO -> fix or rethink the message format (JSON or raw values?)
-	// Parse JSON in map
-	// msg := make(map[string]string)
-	// err := json.Unmarshal(message.Payload(), &msg)
-	// if err != nil {
-	// 	return nil, fmt.Errorf("error unmarshalling data %w", err)
-	// }
-	
+
 	// Parse channel name into single elements
 	channel := message.Topic()
 	channelElems := strings.Split(channel, "/")
-	
+
 	// Check if channel name follows normalized format
 	if len(channelElems) != 6 {
 		return nil, fmt.Errorf("invalid channel format")
 	}
-	
+
 	// Get location type & ID
 	locationType := channelElems[1]
 	locationID, err := strconv.Atoi(channelElems[2])
 	if err != nil {
 		return nil, fmt.Errorf("error converting location ID %w", err)
 	}
-	
+
 	// Get device type & ID
 	device := channelElems[3]
 	deviceID := channelElems[4]
 	moduleName := channelElems[5]
-	
+
 	// Get value in payload
-	// moduleValue, ok := msg["value"]
 	moduleValue := string(message.Payload())
 	if moduleValue == "" {
 		return nil, fmt.Errorf("no value found in payload")
 	}
-	
+
 	// Create data instance
 	data := &Data{
 		DeviceID: deviceID,
@@ -82,7 +73,7 @@ func (m *DataModel) NewData(message mqtt.Message) (*Data, error) {
 		ModuleName:  moduleName,
 		ModuleValue: moduleValue,
 	}
-	
+
 	// Retrieve device and module data from DB
 	err = m.DB.Joins("Module").First(&data.Device, "id = ?", data.DeviceID).Error
 	if err != nil {
@@ -95,7 +86,7 @@ func (m *DataModel) NewData(message mqtt.Message) (*Data, error) {
 			data.ModuleID = module.ID
 		}
 	}
-	
+
 	return data, nil
 }
 
