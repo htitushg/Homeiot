@@ -4,11 +4,11 @@ import (
 	"html/template"
 	"log/slog"
 	"sync"
-	
+
 	"HomeIoT/internal/data"
 	"HomeIoT/internal/mailer"
 	"HomeIoT/internal/validator"
-	
+
 	"github.com/alexedwards/scs/v2"
 	"github.com/go-playground/form/v4"
 )
@@ -62,6 +62,12 @@ type templateData struct {
 	}
 	FieldErrors    map[string]string
 	NonFieldErrors []string
+	Devices        []struct {
+		DeviceID string
+		Name     string
+		Status   string
+		Battery  string
+	}
 }
 
 // envelope is a data type for JSON responses.
