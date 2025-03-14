@@ -18,7 +18,7 @@ type Device struct {
 	Location   Location `gorm:"foreignKey:LocationID"`
 	Type       string
 	Name       string
-	Modules    []Module
+	Modules    []Module `gorm:"foreignKey:DeviceID"`
 }
 
 func (d *Device) GetChannel(iModule IModule) string {
@@ -65,19 +65,16 @@ func (m *DeviceModel) GetByLocationID(locationID uint) ([]*Device, error) {
 
 func (m *DeviceModel) GetAll() ([]*Device, error) {
 	var devices []*Device
-	err := m.DB.Joins("Location").Joins("Module").Find(&devices).Error
+	err := m.DB.Joins("Location").Preload("Modules").Find(&devices).Error
 	if err != nil {
-		switch {
-		case errors.Is(err, gorm.ErrRecordNotFound):
+		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, fmt.Errorf("devices not found: %w", err)
-		default:
-			return nil, fmt.Errorf("failed to get devices: %w", err)
 		}
+		return nil, fmt.Errorf("failed to get devices: %w", err)
 	}
 	if len(devices) == 0 {
 		return nil, fmt.Errorf("0 devices found")
 	}
-
 	return devices, nil
 }
 
