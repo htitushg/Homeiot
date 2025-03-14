@@ -1558,3 +1558,60 @@ form.form-center {
         color: $yellow;
     }
 }
+
+
+//##############################################################################################################
+//                                                  NICO  Devices                                              #
+//##############################################################################################################
+$module-background: #fff;
+$module-border-color: #ddd;
+$highlight-color: #4CAF50;
+
+.home {
+    margin-bottom: 30px;
+    width: 60%;
+
+    .name {
+        font-size: 24px;
+        font-weight: bold;
+        color: $white;
+        margin-bottom: 5px;
+    }
+
+    .type {
+        font-size: 16px;
+        color: #777;
+        margin-bottom: 20px;
+    }
+
+    .module {
+        background-color: $module-background;
+        border: 1px solid $module-border-color;
+        padding: 15px;
+        margin-bottom: 10px;
+        border-radius: 8px;
+        display: flex;
+        justify-content: space-between;
+
+        .module-name {
+            font-size: 16px;
+            color: $blue;
+        }
+
+        .module-value {
+            font-size: 16px;
+            color: $highlight-color;
+            font-weight: bold;
+        }
+    }
+}
+
+.type {
+    font-size: 18px;
+    color: #555;
+}
+
+.module-value {
+    color: #333;
+    font-size: 18px;
+}
