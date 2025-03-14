@@ -3,6 +3,7 @@ package data
 import (
 	"errors"
 	"fmt"
+	"strconv"
 	"time"
 
 	"gorm.io/gorm"
@@ -25,7 +26,8 @@ func (d *Device) GetChannel(iModule IModule) string {
 }
 
 type DeviceModel struct {
-	DB *gorm.DB
+	DB     *gorm.DB
+	Broker *Broker
 }
 
 func (m *DeviceModel) GetByID(id string) (*Device, error) {
@@ -89,6 +91,27 @@ func (m *DeviceModel) UpdateLocation(device *Device) error {
 	if err != nil {
 		return fmt.Errorf("error updating device locationID: %w", err)
 	}
+
+	err = m.Reset(device)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *DeviceModel) Reset(device *Device) error {
+	resetModule, err := NewResetModule()
+	if err != nil {
+		return err
+	}
+	channel := device.GetChannel(resetModule)
+	resetValue, err := ToBool(resetModule.GetValue())
+	if err != nil {
+		return fmt.Errorf("error getting value for reset module %s: %w", resetModule.GetName(), err)
+	}
+
+	m.Broker.Pub(channel, strconv.FormatBool(resetValue))
 
 	return nil
 }

@@ -2,7 +2,7 @@ package data
 
 import (
 	"log/slog"
-	
+
 	"gorm.io/gorm"
 )
 
@@ -11,7 +11,7 @@ type Models struct {
 	Device   *DeviceModel
 	Module   *ModuleModel
 	Data     *DataModel
-	
+
 	ModuleModels *ModuleModels
 }
 
@@ -28,10 +28,10 @@ type ModuleModels struct {
 func NewModels(db *gorm.DB, broker *Broker, logger *slog.Logger) Models {
 	return Models{
 		Location: &LocationModel{DB: db},
-		Device:   &DeviceModel{DB: db},
+		Device:   &DeviceModel{DB: db, Broker: broker},
 		Module:   &ModuleModel{DB: db, Broker: broker},
 		Data:     &DataModel{DB: db, Broker: broker, Logger: logger},
-		
+
 		ModuleModels: &ModuleModels{
 			DB:                db,
 			LightController:   &LightControllerModel{DB: db, Broker: broker},

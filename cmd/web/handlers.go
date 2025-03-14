@@ -3,41 +3,49 @@ package main
 import "net/http"
 
 func (app *application) notFound(w http.ResponseWriter, r *http.Request) {
-	
+
 	// retrieving basic template data
 	tmplData := app.newTemplateData(r)
 	tmplData.Title = "Home IoT - Not Found"
-	
+
 	// rendering the template
 	app.render(w, r, http.StatusOK, "error.tmpl", tmplData)
 }
 
 func (app *application) methodNotAllowed(w http.ResponseWriter, r *http.Request) {
-	
+
 	// retrieving basic template data
 	tmplData := app.newTemplateData(r)
 	tmplData.Title = "Home IoT - Oooops"
-	
+
 	// setting the error title and message
 	tmplData.Error.Title = "Error 405"
 	tmplData.Error.Message = "Something went wrong!"
-	
+
 	// rendering the template
 	app.render(w, r, http.StatusOK, "error.tmpl", tmplData)
 }
 
 func (app *application) index(w http.ResponseWriter, r *http.Request) {
-	
+
 	// retrieving basic template data
 	tmplData := app.newTemplateData(r)
 	tmplData.Title = "Home IoT - Home"
-	
+
 	// rendering the template
 	app.render(w, r, http.StatusOK, "home.tmpl", tmplData)
 }
 
 func (app *application) dashboard(w http.ResponseWriter, r *http.Request) {
+	devices, err := app.Models.Device.GetAll()
+	if err != nil {
+		app.serverError(w, r, err)
+		return
+	}
+	tmplData := app.newTemplateData(r)
+	tmplData.Devices = devices
 
+	app.render(w, r, http.StatusOK, "home.tmpl", tmplData)
 }
 func (app *application) commandDevice(w http.ResponseWriter, r *http.Request) {
 

@@ -1,0 +1,14 @@
+{{define "page"}}
+    <div class="home">
+        {{ range .Devices }}
+            <div class="name">{{ .Name }}</div>
+            <div class="type">{{ .Type }}</div>
+            {{ range .Modules}}
+                <div class="module">
+                    <div class="module-name">{{ .Name }}</div>
+                    <div class="module-value">{{ .Value }}</div>
+                </div>
+            {{ end }}
+        {{ end }}
+    </div>
+{{end}}

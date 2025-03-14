@@ -4,11 +4,11 @@ import (
 	"html/template"
 	"log/slog"
 	"sync"
-	
+
 	"HomeIoT/internal/data"
 	"HomeIoT/internal/mailer"
 	"HomeIoT/internal/validator"
-	
+
 	"github.com/alexedwards/scs/v2"
 	"github.com/go-playground/form/v4"
 )
@@ -56,7 +56,13 @@ type templateData struct {
 	Nonce       string
 	CSRFToken   string
 	ResetToken  string
-	Error       struct {
+
+	Devices   []*data.Device
+	Locations []*data.Location
+	Device    *data.Device
+	Location  *data.Location
+
+	Error struct {
 		Title   string
 		Message string
 	}
