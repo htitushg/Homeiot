@@ -68,6 +68,12 @@ type templateData struct {
 	}
 	FieldErrors    map[string]string
 	NonFieldErrors []string
+	Devices        []struct {
+		DeviceID string
+		Name     string
+		Status   string
+		Battery  string
+	}
 }
 
 // envelope is a data type for JSON responses.

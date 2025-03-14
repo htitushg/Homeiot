@@ -1,0 +1,66 @@
+{{define "base"}}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{.Title}}</title>
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    <header>
+        <h1>{{.Title}}</h1>
+        <nav>
+            <a href="/">Home</a>
+            <a href="/dashboard">Dashboard</a>
+        </nav>
+    </header>
+
+    <main>
+        {{template "content" .}}
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Home IoT System</p>
+    </footer>
+</body>
+</html>
+{{end}}
+
+{{define "content"}}
+<h2>Connected Devices</h2>
+<table border="1">
+    <tr>
+        <th>Device ID</th>
+        <th>Name</th>
+        <th>Status</th>
+        <th>Battery</th>
+        <th>Action</th>
+    </tr>
+    {{range .Devices}}
+    <tr>
+        <td>{{.DeviceID}}</td>
+        <td>{{.Name}}</td>
+        <td>{{.Status}}</td>
+        <td>{{.Battery}}</td>
+        <td>
+            <button onclick="sendCommand('{{.DeviceID}}', 'turn_on')">Turn On</button>
+            <button onclick="sendCommand('{{.DeviceID}}', 'turn_off')">Turn Off</button>
+        </td>
+    </tr>
+    {{end}}
+</table>
+
+<script>
+function sendCommand(deviceId, command) {
+    fetch('/command-device', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ device_id: deviceId, command: command })
+    })
+    .then(response => response.json())
+    .then(data => alert(data.message))
+    .catch(error => console.error('Error:', error));
+}
+</script>
+{{end}}
