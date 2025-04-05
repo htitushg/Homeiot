@@ -20,6 +20,19 @@ var ModuleNames = []string{
 	RESET,
 }
 
+/**
+ * mettreAJourModulePartiel met à jour un module partiellement dans la base de données.
+ * Il utilise GORM pour effectuer la mise à jour.
+ */
+func (m *ModuleModels) updateModulePartial(deviceID string, moduleID uint, champsAMettreAJour string) error {
+	return m.DB.Model(&Module{}).Where("device_id = ? AND id = ?", deviceID, moduleID).Updates(champsAMettreAJour).Error
+}
+
+/**
+ * ModuleModels is a struct that contains the database connection and the models for each module type.
+ * It is used to interact with the database and perform CRUD operations on modules.
+ */
+
 func (m *ModuleModels) Set(module Module, value any) error {
 	iModule, err := module.ToIModule()
 	if err != nil {
@@ -36,6 +49,7 @@ func (m *ModuleModels) Set(module Module, value any) error {
 	switch iModule.(type) {
 
 	case LightController:
+
 		err = m.LightController.Set(channel, value)
 		if err != nil {
 			return err
@@ -48,18 +62,30 @@ func (m *ModuleModels) Set(module Module, value any) error {
 		}
 
 	case PresenceDetector:
+
+		if err != nil {
+			return err
+		}
 		err = m.PresenceDetector.Set(channel, value)
 		if err != nil {
 			return err
 		}
 
 	case LuminositySensor:
+
+		if err != nil {
+			return err
+		}
 		err = m.LuminositySensor.Set(channel, value)
 		if err != nil {
 			return err
 		}
 
 	case TemperatureSensor:
+
+		if err != nil {
+			return err
+		}
 		err = m.TemperatureSensor.Set(channel, value)
 		if err != nil {
 			return err

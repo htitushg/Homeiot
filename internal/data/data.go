@@ -27,6 +27,20 @@ type DataModel struct {
 	Logger *slog.Logger
 }
 
+func (m *DataModel) updateModule(deviceID string, moduleID uint, nouveauNom string, nouvelleValeur string) error {
+	module := Module{}
+	err := m.DB.Where("device_id = ? AND id = ?", deviceID, moduleID).First(&module).Error
+	if err != nil {
+		return err
+	}
+
+	module.Name = nouveauNom
+	module.Value = nouvelleValeur
+
+	err = m.DB.Save(&module).Error
+	return err
+}
+
 func (m *DataModel) NewData(message mqtt.Message) (*Data, error) {
 	// Parse channel name into single elements
 	channel := message.Topic()
@@ -76,8 +90,6 @@ func (m *DataModel) NewData(message mqtt.Message) (*Data, error) {
 
 	// Retrieve device and module data from DB
 	m.Logger.Debug("NewData data : ", slog.String("Device.ID", data.Device.ID), slog.String("LocationID", data.Device.Location.Name), slog.String("ModuleName", data.ModuleName), slog.String("ModuleValue", data.ModuleValue))
-	// err = m.DB.Joins("Module").First(&data.Device, "id = ?", data.DeviceID).Error
-
 	// DEBUG
 	//err = m.DB.Debug().Preload("Modules").First(&device, "id = ?", deviceID).Error
 	//if err != nil {
@@ -95,7 +107,11 @@ func (m *DataModel) NewData(message mqtt.Message) (*Data, error) {
 			data.ModuleID = module.ID
 		}
 	}
-
+	// Mise à jour de la valeur du module
+	err = m.updateModule(deviceID, data.ModuleID, moduleName, moduleValue)
+	if err != nil {
+		return nil, fmt.Errorf("Erreur de mise à jour du module %s, valeur %s  error: %w", moduleName, moduleValue, err)
+	}
 	return data, nil
 }
 
