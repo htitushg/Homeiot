@@ -6,6 +6,7 @@ import (
 	"log/slog"
 	"strconv"
 	"strings"
+	"time"
 
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"gorm.io/gorm"
@@ -27,7 +28,6 @@ type DataModel struct {
 }
 
 func (m *DataModel) NewData(message mqtt.Message) (*Data, error) {
-
 	// Parse channel name into single elements
 	channel := message.Topic()
 	channelElems := strings.Split(channel, "/")
@@ -75,11 +75,20 @@ func (m *DataModel) NewData(message mqtt.Message) (*Data, error) {
 	}
 
 	// Retrieve device and module data from DB
-	err = m.DB.Joins("Module").First(&data.Device, "id = ?", data.DeviceID).Error
+	m.Logger.Debug("NewData data : ", slog.String("Device.ID", data.Device.ID), slog.String("LocationID", data.Device.Location.Name), slog.String("ModuleName", data.ModuleName), slog.String("ModuleValue", data.ModuleValue))
+	// err = m.DB.Joins("Module").First(&data.Device, "id = ?", data.DeviceID).Error
+
+	// DEBUG
+	//err = m.DB.Debug().Preload("Modules").First(&device, "id = ?", deviceID).Error
+	//if err != nil {
+	//	return nil, fmt.Errorf("error finding device %w", err)
+	//}
+	err = m.DB.Preload("Modules").First(&data.Device, "id = ?", deviceID).Error
 	if err != nil {
 		// FIXME -> reset device or skip data?
 		return nil, fmt.Errorf("error finding device %w", err)
 	}
+
 	// Get ModuleID from Device.Modules by matching Device.ID/Module.Type
 	for _, module := range data.Device.Modules {
 		if module.Name == data.ModuleName {
@@ -102,7 +111,8 @@ func (m *DataModel) insert(data *Data) error {
 }
 
 func (m *DataModel) Check(device *Device) error {
-	err := m.DB.Joins("Location").Joins("Module").First(&device, "id = ?", device.ID).Error
+	//err := m.DB.Model(&device).Joins("locations").Joins("modules").First(&device, "id = ?", device.ID).Error
+	err := m.DB.Preload("Location").Preload("Modules").First(&device, "id = ?", device.ID).Error
 	if err != nil {
 		switch {
 		case errors.Is(err, gorm.ErrRecordNotFound):
@@ -111,5 +121,6 @@ func (m *DataModel) Check(device *Device) error {
 			return fmt.Errorf("error fetching device %v: %w", device.ID, err)
 		}
 	}
+	time.Sleep(5 * time.Second)
 	return nil
 }

@@ -2,7 +2,7 @@ package data
 
 import (
 	"fmt"
-	
+
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 )
 
@@ -15,12 +15,12 @@ type Broker struct {
 func NewBroker(host string, port int64, qos byte) *Broker {
 	opts := mqtt.NewClientOptions()
 	opts.AddBroker(fmt.Sprintf("%s:%d", host, port))
-	
+
 	client := mqtt.NewClient(opts)
 	if token := client.Connect(); token.Wait() && token.Error() != nil {
 		panic(token.Error())
 	}
-	
+
 	return &Broker{
 		opts:   *opts,
 		Client: client,

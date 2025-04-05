@@ -98,10 +98,22 @@ func main() {
 	}
 
 	// Execute migrations if necessary
-	err = db.AutoMigrate(&data.Data{}, &data.Module{})
-	if err != nil {
-		panic(fmt.Errorf("failed to auto migrate: %w", err))
-	}
+	//err = db.AutoMigrate(&data.Data{}, &data.Module{})
+
+	// Migrer les modèles
+	db.AutoMigrate(&data.Data{}, &data.Module{})
+
+	// Créer la table intermédiaire devices_modules
+	//if !db.Migrator().HasTable("devices_modules") {
+	//	err = db.Migrator().CreateTable()
+	//	if err != nil {
+	//		panic("échec de la création de la table devices_modules")
+	//	}
+	//}
+
+	//if err != nil {
+	//	panic(fmt.Errorf("failed to auto migrate: %w", err))
+	//}
 
 	// caching the templates
 	templateCache, err := newTemplateCache()
@@ -135,6 +147,9 @@ func main() {
 		Models:         data.NewModels(db, broker, logger),
 		wg:             new(sync.WaitGroup),
 	}
+
+	// subscribing to the MQTT Broker
+	app.Models.Data.Sub(app.config.broker.subscriptionChannel)
 
 	// Running the server
 	err = app.serve()

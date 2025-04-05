@@ -19,7 +19,13 @@ type Device struct {
 	Type       string
 	Name       string
 	Modules    []Module `gorm:"foreignKey:DeviceID"`
+	//Modules []Module `gorm:"many2many:devices_modules;"`
 }
+
+//type Devices_modules struct {
+//	DeviceID string `gorm:"primaryKey"`
+//	ModuleID int    `gorm:"primaryKey"`
+//}
 
 func (d *Device) GetChannel(iModule IModule) string {
 	return fmt.Sprintf("home/%s/%d/%s/%s/%s", d.Location.Type, d.LocationID, d.Type, d.ID, iModule.GetName())
@@ -78,6 +84,12 @@ func (m *DeviceModel) GetAll() ([]*Device, error) {
 	return devices, nil
 }
 
+/**
+ * UpdateLocation updates the location of a device in the database.
+ * It first checks if the location exists, and if not, it creates a new location.
+ * Then it updates the device's location ID in the database.
+ * Finally, it resets the device.
+ */
 func (m *DeviceModel) UpdateLocation(device *Device) error {
 
 	result := m.DB.FirstOrCreate(&device.Location, &Location{Name: device.Location.Name, Type: device.Location.Type})

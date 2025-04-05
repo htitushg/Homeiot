@@ -22,6 +22,7 @@ func NewStartupMessage(payload []byte) (*StartupMessage, error) {
 	if err := json.Unmarshal(payload, &startupMessage); err != nil {
 		return nil, fmt.Errorf("failed to unmarshal payload: %w", err)
 	}
+	fmt.Printf("Message StartupMessage: %s", startupMessage.LocationName)
 	return &startupMessage, nil
 }
 
